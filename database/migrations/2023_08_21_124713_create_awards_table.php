@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('awards', function (Blueprint $table) {
+            $table->id();
+            $table->uuid()->index();
+            $table->unsignedBigInteger('personnel_id');
+            $table->foreign('personnel_id')
+                ->references('id')->on('personnel')->onDelete('cascade');
+            $table->string('award_type')->nullable();
+            $table->string('description')->nullable();
+            $table->integer('numeral')->nullable();
+            $table->date('date_awarded')->nullable();
+            $table->mediumText('authority_remarks')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('awards');
+    }
+};
