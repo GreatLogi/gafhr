@@ -31277,7 +31277,7 @@ text.highcharts-drilldown-data-label {
 
 /* image varient start */
 .aut-bg-img {
-    background-image: url("../images/auth/img-auth-big.png.png");
+    background-image: url("../images/auth/img-auth-big.png");
     background-size: cover;
     background-attachment: fixed;
     background-position: center;
@@ -31288,6 +31288,64 @@ text.highcharts-drilldown-data-label {
 }
 
 /* image varient End */
+.auth-wrapper.auth-split-layout {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    background: #f4f7fa;
+    min-height: 100vh;
+}
+
+.auth-wrapper.auth-split-layout .auth-image-pane {
+    width: 50%;
+    min-height: 100vh;
+    background-image: url("../images/auth/gafimage.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.auth-wrapper.auth-split-layout .auth-form-pane {
+    width: 50%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #ffffff;
+}
+
+.auth-wrapper.auth-split-layout .auth-form-pane .auth-content {
+    width: 100%;
+    max-width: 460px;
+    padding: 0;
+}
+
+.auth-wrapper.auth-split-layout .auth-form-pane .card {
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+@media only screen and (max-width: 991px) {
+    .auth-wrapper.auth-split-layout {
+        flex-direction: column;
+    }
+
+    .auth-wrapper.auth-split-layout .auth-image-pane,
+    .auth-wrapper.auth-split-layout .auth-form-pane {
+        width: 100%;
+    }
+
+    .auth-wrapper.auth-split-layout .auth-image-pane {
+        min-height: 240px;
+    }
+
+    .auth-wrapper.auth-split-layout .auth-form-pane {
+        min-height: auto;
+        padding: 16px;
+    }
+}
+
 /**====== Authentication css end ======**/
 /**  =====================
       Authentication css start
