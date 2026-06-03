@@ -64,15 +64,15 @@
             <div class="card-body">
                 <h5 class="mb-3 form-title">Edit Personnel</h5>
                 <div class="mb-3 d-flex flex-wrap gap-2">
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.awards', $personnel->uuid) }}">Awards</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.courses', $personnel->uuid) }}">Courses</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.promotions', $personnel->uuid) }}">Promotions</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.documents', $personnel->uuid) }}">Documents</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.family', $personnel->uuid) }}">Family</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.next_of_kin', $personnel->uuid) }}">Next of Kin</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.posts', $personnel->uuid) }}">Posts</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.remarks', $personnel->uuid) }}">Remarks</a>
-                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.interviews', $personnel->uuid) }}">Interviews</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.awards', $personnel->uuid) }}"><i class="feather icon-award mr-1"></i>Awards</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.courses', $personnel->uuid) }}"><i class="feather icon-book-open mr-1"></i>Courses</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.promotions', $personnel->uuid) }}"><i class="feather icon-trending-up mr-1"></i>Promotions</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.documents', $personnel->uuid) }}"><i class="feather icon-file-text mr-1"></i>Documents</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.family', $personnel->uuid) }}"><i class="feather icon-users mr-1"></i>Family</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.next_of_kin', $personnel->uuid) }}"><i class="feather icon-heart mr-1"></i>Next of Kin</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.posts', $personnel->uuid) }}"><i class="feather icon-map-pin mr-1"></i>Posts</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.remarks', $personnel->uuid) }}"><i class="feather icon-message-square mr-1"></i>Remarks</a>
+                    <a class="btn btn-outline-primary btn-sm open-related-modal" href="{{ route('admin.personnel.interviews', $personnel->uuid) }}"><i class="feather icon-edit-3 mr-1"></i>Interviews</a>
                 </div>
                 <form method="POST" action="{{ route('admin.personnel.update', $personnel->uuid) }}"
                     enctype="multipart/form-data">
@@ -101,7 +101,8 @@
                                         @if ($field === 'personnel_image')
                                             <div class="mb-2">
                                                 <img id="personnelImagePreview"
-                                                    src="{{ $personnel->personnel_image ? asset($personnel->personnel_image) : asset('img/avatar.jpg') }}"
+                                                    src="{{ $personnel->photo }}"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/avatar.jpg') }}';"
                                                     alt="Personnel Photo" class="img-fluid rounded" style="max-height: 200px;">
                                             </div>
                                             <input type="file" class="form-control" id="{{ $field }}" name="{{ $field }}"

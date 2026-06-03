@@ -29,7 +29,6 @@
                     <ul class="pcoded-submenu">
                         <li><a href="{{ route('record-manager') }}">Records Manager</a></li>
                         <li><a href="{{ route('create-record') }}"> Add New</a></li>
-                
                     </ul>
                 </li>
                 <li class="nav-item pcoded-hasmenu">

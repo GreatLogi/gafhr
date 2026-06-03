@@ -93,6 +93,7 @@
                                             <div class="mb-2">
                                                 <img id="personnelImagePreview"
                                                     src="{{ asset('assets/images/defaultprofile.jpg') }}"
+                                                    onerror="this.onerror=null;this.src='{{ asset('img/avatar.jpg') }}';"
                                                     alt="Personnel Photo" class="rounded img-fluid"
                                                     style="max-height: 200px;">
                                             </div>
