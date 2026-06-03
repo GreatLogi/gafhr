@@ -15,7 +15,9 @@ class personnelcontroller extends Controller
 {
     public function index(Request $request)
     {
-        $query = Personnel::query();
+        $query = auth()->check()
+            ? auth()->user()->scopePersonnelQuery(Personnel::query())
+            : Personnel::query();
 
         if (Schema::hasColumn('personnel', 'service_category')) {
             $query->orderByRaw("FIELD(service_category, 'OFFICER') DESC")

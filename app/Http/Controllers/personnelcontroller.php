@@ -135,6 +135,7 @@ class personnelcontroller extends Controller
     public function adminEdit($uuid)
     {
         $personnel = Personnel::where('uuid', $uuid)->firstOrFail();
+        abort_unless(auth()->user()->canManagePersonnel($personnel), 403);
         $fields = (new Personnel())->getFillable();
         $units = Unit::all();
         $ranks = rank::all();
@@ -174,6 +175,7 @@ class personnelcontroller extends Controller
     public function adminUpdate(Request $request, $uuid)
     {
         $personnel = Personnel::where('uuid', $uuid)->firstOrFail();
+        abort_unless(auth()->user()->canManagePersonnel($personnel), 403);
 
         $request->validate([
             'service_no' => 'required',

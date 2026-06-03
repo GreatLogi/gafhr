@@ -94,6 +94,12 @@ final class User extends Authenticatable
         'theme',
         'password_updated_at',
         'arm_of_service',
+        'ghq_id',
+        'department_id',
+        'directorate_id',
+        'service_hq_id',
+        'command_hq_id',
+        'unit_id',
         'category',
         'service_email',
         'appointment_email',
@@ -132,6 +138,36 @@ final class User extends Authenticatable
     public function personnel()
     {
         return $this->hasOne(Personnel::class, 'service_no', 'service_no');
+    }
+
+    public function ghq()
+    {
+        return $this->belongsTo(Ghq::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function directorate()
+    {
+        return $this->belongsTo(Directorate::class);
+    }
+
+    public function serviceHq()
+    {
+        return $this->belongsTo(ServiceHq::class);
+    }
+
+    public function commandHq()
+    {
+        return $this->belongsTo(CommandHq::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 
     public function last_login()
@@ -195,5 +231,45 @@ final class User extends Authenticatable
         $this->save();
 
         return $otp;
+    }
+
+    public function managementScope(): array
+    {
+        foreach ([
+            'unit_id',
+            'command_hq_id',
+            'service_hq_id',
+            'directorate_id',
+            'department_id',
+            'ghq_id',
+        ] as $column) {
+            if (! empty($this->{$column})) {
+                return [$column, $this->{$column}];
+            }
+        }
+
+        return [null, null];
+    }
+
+    public function scopePersonnelQuery(Builder $query): Builder
+    {
+        [$column, $value] = $this->managementScope();
+
+        if (! $column || ! $value) {
+            return $query;
+        }
+
+        return $query->where($column, $value);
+    }
+
+    public function canManagePersonnel(Personnel $personnel): bool
+    {
+        [$column, $value] = $this->managementScope();
+
+        if (! $column || ! $value) {
+            return true;
+        }
+
+        return (string) $personnel->{$column} === (string) $value;
     }
 }

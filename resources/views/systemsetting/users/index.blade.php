@@ -46,6 +46,7 @@
                                     <th width="12%">Status</th>
                                     <th width="12%">Password</th>
                                     <th width="15%">Roles</th>
+                                    <th width="18%">Management Scope</th>
                                     <th width="15%">Action</th>
                                 </tr>
                             </thead>
@@ -81,6 +82,9 @@
                                                     {{ $role->name }}
                                                 </span>
                                             @endforeach
+                                        </td>
+                                        <td>
+                                            {{ $user->unit->unit_name ?? $user->commandHq->command_name ?? $user->serviceHq->service_name ?? $user->directorate->directorate_name ?? $user->department->department ?? $user->ghq->name ?? 'ALL' }}
                                         </td>
 
                                         <td>

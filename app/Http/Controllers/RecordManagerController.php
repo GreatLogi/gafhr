@@ -20,7 +20,8 @@ class RecordManagerController extends Controller
 
     public function PersonnelData()
     {
-        $data = Personnel::with('organic_unit')->select([
+        $user = auth()->user();
+        $data = $user->scopePersonnelQuery(Personnel::with('organic_unit'))->select([
             'id',
             'uuid',
             'service_no',
@@ -32,6 +33,11 @@ class RecordManagerController extends Controller
             'arm_of_service',
             'present_rank',
             'unit_id',
+            'ghq_id',
+            'department_id',
+            'directorate_id',
+            'service_hq_id',
+            'command_hq_id',
             'status',
         ]);
 

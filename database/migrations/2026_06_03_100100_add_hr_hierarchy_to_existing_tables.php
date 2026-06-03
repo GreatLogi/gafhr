@@ -27,7 +27,8 @@ return new class extends Migration
                 $table->foreignId('command_hq_id')->nullable()->after('id')->constrained('command_hqs')->nullOnDelete();
             }
             if (!Schema::hasColumn('units', 'unit_code')) {
-                $table->string('unit_code')->nullable()->after('unit_name');
+                $afterColumn = Schema::hasColumn('units', 'unit_name') ? 'unit_name' : 'unit';
+                $table->string('unit_code')->nullable()->after($afterColumn);
             }
             if (!Schema::hasColumn('units', 'unit_type')) {
                 $table->string('unit_type')->nullable()->after('unit_code');
@@ -36,19 +37,19 @@ return new class extends Migration
 
         Schema::table('personnel', function (Blueprint $table) {
             if (!Schema::hasColumn('personnel', 'ghq_id')) {
-                $table->foreignId('ghq_id')->nullable()->after('present_rank')->constrained('ghqs')->nullOnDelete();
+                $table->unsignedBigInteger('ghq_id')->nullable()->after('present_rank');
             }
             if (!Schema::hasColumn('personnel', 'department_id')) {
-                $table->foreignId('department_id')->nullable()->after('ghq_id')->constrained('departments')->nullOnDelete();
+                $table->unsignedBigInteger('department_id')->nullable()->after('ghq_id');
             }
             if (!Schema::hasColumn('personnel', 'directorate_id')) {
-                $table->foreignId('directorate_id')->nullable()->after('department_id')->constrained('directorates')->nullOnDelete();
+                $table->unsignedBigInteger('directorate_id')->nullable()->after('department_id');
             }
             if (!Schema::hasColumn('personnel', 'service_hq_id')) {
-                $table->foreignId('service_hq_id')->nullable()->after('directorate_id')->constrained('service_hqs')->nullOnDelete();
+                $table->unsignedBigInteger('service_hq_id')->nullable()->after('directorate_id');
             }
             if (!Schema::hasColumn('personnel', 'command_hq_id')) {
-                $table->foreignId('command_hq_id')->nullable()->after('service_hq_id')->constrained('command_hqs')->nullOnDelete();
+                $table->unsignedBigInteger('command_hq_id')->nullable()->after('service_hq_id');
             }
         });
     }
@@ -58,7 +59,7 @@ return new class extends Migration
         Schema::table('personnel', function (Blueprint $table) {
             foreach (['command_hq_id', 'service_hq_id', 'directorate_id', 'department_id', 'ghq_id'] as $column) {
                 if (Schema::hasColumn('personnel', $column)) {
-                    $table->dropConstrainedForeignId($column);
+                    $table->dropColumn($column);
                 }
             }
         });

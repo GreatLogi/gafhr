@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CommandHq;
+use App\Models\Department;
+use App\Models\Directorate;
+use App\Models\Ghq;
+use App\Models\ServiceHq;
+use App\Models\Unit;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -39,7 +45,7 @@ class UserController extends Controller
             $alertMessage .= '.Please take necessary actions.';
             session()->flash('alert', $alertMessage);
         }
-        $users = User::all();
+        $users = User::with(['ghq', 'department', 'directorate', 'serviceHq', 'commandHq', 'unit', 'roles'])->get();
 
         return view('systemsetting.users.index', compact('users'));
     }
@@ -53,8 +59,14 @@ class UserController extends Controller
     {
        
         $roles = Role::all();
+        $ghqs = Ghq::orderBy('name')->get();
+        $departments = Department::orderBy('department')->get();
+        $directorates = Directorate::orderBy('directorate_name')->get();
+        $serviceHqs = ServiceHq::orderBy('service_name')->get();
+        $commandHqs = CommandHq::orderBy('command_name')->get();
+        $units = Unit::orderBy('unit_name')->get();
 
-        return view('systemsetting.users.create', compact('roles'));
+        return view('systemsetting.users.create', compact('roles', 'ghqs', 'departments', 'directorates', 'serviceHqs', 'commandHqs', 'units'));
     }
 
     /**
@@ -75,6 +87,12 @@ class UserController extends Controller
         $temporaryPassword = (string) random_int(10000000, 99999999);
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->ghq_id = $request->ghq_id;
+        $user->department_id = $request->department_id;
+        $user->directorate_id = $request->directorate_id;
+        $user->service_hq_id = $request->service_hq_id;
+        $user->command_hq_id = $request->command_hq_id;
+        $user->unit_id = $request->unit_id;
         $user->status = '1';
         $user->password = bcrypt($temporaryPassword);
         $user->password_changed_at = null;
@@ -113,8 +131,14 @@ class UserController extends Controller
        
         $user = User::find($id);
         $roles = Role::all();
+        $ghqs = Ghq::orderBy('name')->get();
+        $departments = Department::orderBy('department')->get();
+        $directorates = Directorate::orderBy('directorate_name')->get();
+        $serviceHqs = ServiceHq::orderBy('service_name')->get();
+        $commandHqs = CommandHq::orderBy('command_name')->get();
+        $units = Unit::orderBy('unit_name')->get();
 
-        return view('systemsetting.users.edit', compact('user', 'roles'));
+        return view('systemsetting.users.edit', compact('user', 'roles', 'ghqs', 'departments', 'directorates', 'serviceHqs', 'commandHqs', 'units'));
     }
 
     /**
@@ -135,6 +159,12 @@ class UserController extends Controller
         ]);
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->ghq_id = $request->ghq_id;
+        $user->department_id = $request->department_id;
+        $user->directorate_id = $request->directorate_id;
+        $user->service_hq_id = $request->service_hq_id;
+        $user->command_hq_id = $request->command_hq_id;
+        $user->unit_id = $request->unit_id;
         $user->save();
         $user->roles()->detach();
         if ($request->roles) {
