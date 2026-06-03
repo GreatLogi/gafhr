@@ -75,6 +75,7 @@ Route::prefix('gaf-hr')->group(function () {
 
     Route::prefix('admin')->group(function () {
         Route::get('/officers', [TrackTravelDashboardController::class, 'officerAnalysis'])->name('admin.officers');
+        Route::get('/enlisted', [TrackTravelDashboardController::class, 'enlistedAnalysis'])->name('admin.enlisted');
         Route::get('/soldiers', [TrackTravelDashboardController::class, 'soldierAnalysis'])->name('admin.soldiers');
         Route::get('/ratings', [TrackTravelDashboardController::class, 'ratingAnalysis'])->name('admin.ratings');
      

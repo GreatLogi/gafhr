@@ -152,6 +152,16 @@ class TrackTravelDashboardController extends Controller
 
     public function soldierAnalysis()
     {
+        return redirect()->route('admin.enlisted');
+    }
+
+    public function ratingAnalysis()
+    {
+        return redirect()->route('admin.enlisted');
+    }
+
+    public function enlistedAnalysis()
+    {
         $services = ['ARMY', 'AIRFORCE'];
         $serviceCharts = [];
 
@@ -204,6 +214,9 @@ class TrackTravelDashboardController extends Controller
 
             $serviceCharts[] = [
                 'service' => $service,
+                'level' => 'SOLDIER',
+                'title' => $service . ' SOLDIERS',
+                'datasetLabel' => 'Soldiers',
                 'total' => $soldierTotal,
                 'genderLabels' => $genderLabels,
                 'genderCounts' => $genderCounts,
@@ -212,13 +225,6 @@ class TrackTravelDashboardController extends Controller
             ];
         }
 
-        return view('admin.soldiers', [
-            'serviceCharts' => $serviceCharts,
-        ]);
-    }
-
-    public function ratingAnalysis()
-    {
         $service = 'NAVY';
 
         $ratingTotal = Personnel::whereRaw('UPPER(level) = ?', ['RATING'])
@@ -261,13 +267,20 @@ class TrackTravelDashboardController extends Controller
         })->values();
         $rankCounts = $rankData->pluck('total')->map(fn ($v) => (int) $v)->values();
 
-        return view('admin.ratings', [
+        $serviceCharts[] = [
             'service' => $service,
+            'level' => 'RATING',
+            'title' => $service . ' RATINGS',
+            'datasetLabel' => 'Ratings',
             'total' => $ratingTotal,
             'genderLabels' => $genderLabels,
             'genderCounts' => $genderCounts,
             'rankLabels' => $rankLabels,
             'rankCounts' => $rankCounts,
+        ];
+
+        return view('admin.enlisted', [
+            'serviceCharts' => $serviceCharts,
         ]);
     }
     public function approve_return()

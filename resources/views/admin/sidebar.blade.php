@@ -19,14 +19,8 @@
                             Analysis</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('admin.soldiers') }}" class="nav-link "><span class="pcoded-micon"><i
-                                class="feather icon-bar-chart-2"></i></span><span class="pcoded-mtext">Soldiers
-                            Analysis</span></a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.ratings') }}" class="nav-link "><span class="pcoded-micon"><i
-                                class="feather icon-bar-chart-2"></i></span><span class="pcoded-mtext">Ratings
-                            Analysis</span></a>
+                    <a href="{{ route('admin.enlisted') }}" class="nav-link "><span class="pcoded-micon"><i
+                                class="feather icon-bar-chart-2"></i></span><span class="pcoded-mtext">Soldiers</span></a>
                 </li>
 
                 <li class="nav-item pcoded-hasmenu">
@@ -35,13 +29,7 @@
                     <ul class="pcoded-submenu">
                         <li><a href="{{ route('record-manager') }}">Records Manager</a></li>
                         <li><a href="{{ route('create-record') }}"> Add New</a></li>
-                        {{-- @can('superadmin.view')
-                            <li><a href="{{ route('view-record') }}"> All Records</a></li>
-                            <li><a href="{{ route('mission-pending') }}">Standby(Pending)</a></li>
-                            <li><a href="{{ route('approve-personnel') }}">Pending Departure</a></li>
-                            <li><a href="{{ route('on-mission') }}">Travelled</a></li>
-                            <li><a href="{{ route('course.arrived') }}">Retuned</a></li>
-                        @endcan --}}
+                
                     </ul>
                 </li>
                 <li class="nav-item pcoded-hasmenu">
