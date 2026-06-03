@@ -130,7 +130,7 @@
                 <!-- ========   change your logo hear   ============ -->
                 {{-- <img src="{{ asset('assets/images/logo.png') }}" alt="" class="logo"> --}}
                 {{-- <img src="{{ asset('assets/images/try2-01.png') }}" alt="" class="logo" style="height: 40px"> --}}
-                GAR HR
+                GAF HR
             </a>
             <a href="#!" class="mob-toggler">
                 <i class="feather icon-more-vertical"></i>

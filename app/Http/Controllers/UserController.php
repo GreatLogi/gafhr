@@ -12,6 +12,8 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -64,7 +66,7 @@ class UserController extends Controller
         $directorates = Directorate::orderBy('directorate_name')->get();
         $serviceHqs = ServiceHq::orderBy('service_name')->get();
         $commandHqs = CommandHq::orderBy('command_name')->get();
-        $units = Unit::orderBy('unit_name')->get();
+        $units = Unit::orderBy($this->unitOrderColumn())->get();
 
         return view('systemsetting.users.create', compact('roles', 'ghqs', 'departments', 'directorates', 'serviceHqs', 'commandHqs', 'units'));
     }
@@ -82,6 +84,7 @@ class UserController extends Controller
             'name' => 'required|max:50|unique:users',
             'email' => 'required|max:100|email|unique:users',
         ]);
+        $this->validateHierarchyChain($request);
         // Create New Admin
         $user = new User();
         $temporaryPassword = (string) random_int(10000000, 99999999);
@@ -136,7 +139,7 @@ class UserController extends Controller
         $directorates = Directorate::orderBy('directorate_name')->get();
         $serviceHqs = ServiceHq::orderBy('service_name')->get();
         $commandHqs = CommandHq::orderBy('command_name')->get();
-        $units = Unit::orderBy('unit_name')->get();
+        $units = Unit::orderBy($this->unitOrderColumn())->get();
 
         return view('systemsetting.users.edit', compact('user', 'roles', 'ghqs', 'departments', 'directorates', 'serviceHqs', 'commandHqs', 'units'));
     }
@@ -157,6 +160,7 @@ class UserController extends Controller
             'name' => 'required|max:50',
             'email' => 'required|max:100|email|unique:users,email,' . $id,
         ]);
+        $this->validateHierarchyChain($request);
         $user->name = $request->name;
         $user->email = $request->email;
         $user->ghq_id = $request->ghq_id;
@@ -208,5 +212,63 @@ class UserController extends Controller
         session()->flash('success', 'User has been deleted !!');
 
         return back();
+    }
+
+    private function unitOrderColumn(): string
+    {
+        return Schema::hasColumn('units', 'unit_name') ? 'unit_name' : 'unit';
+    }
+
+    private function validateHierarchyChain(Request $request): void
+    {
+        $ghqId = $request->input('ghq_id');
+        $serviceHqId = $request->input('service_hq_id');
+        $commandHqId = $request->input('command_hq_id');
+        $unitId = $request->input('unit_id');
+
+        if ($serviceHqId) {
+            $serviceHq = ServiceHq::query()->find($serviceHqId);
+            if (! $serviceHq) {
+                throw ValidationException::withMessages([
+                    'service_hq_id' => 'The selected Service HQ does not exist.',
+                ]);
+            }
+
+            if ($ghqId && (string) $serviceHq->ghq_id !== (string) $ghqId) {
+                throw ValidationException::withMessages([
+                    'service_hq_id' => 'The selected Service HQ does not belong to the selected GHQ.',
+                ]);
+            }
+        }
+
+        if ($commandHqId) {
+            $commandHq = CommandHq::query()->find($commandHqId);
+            if (! $commandHq) {
+                throw ValidationException::withMessages([
+                    'command_hq_id' => 'The selected Command HQ does not exist.',
+                ]);
+            }
+
+            if ($serviceHqId && (string) $commandHq->service_hq_id !== (string) $serviceHqId) {
+                throw ValidationException::withMessages([
+                    'command_hq_id' => 'The selected Command HQ does not belong to the selected Service HQ.',
+                ]);
+            }
+        }
+
+        if ($unitId) {
+            $unit = Unit::query()->find($unitId);
+            if (! $unit) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'The selected Unit does not exist.',
+                ]);
+            }
+
+            if ($commandHqId && (string) $unit->command_hq_id !== (string) $commandHqId) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'The selected Unit does not belong to the selected Command HQ.',
+                ]);
+            }
+        }
     }
 }

@@ -23,6 +23,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Image;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -98,6 +99,7 @@ class personnelcontroller extends Controller
             'sex' => 'required',
             'personnel_image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
+        $this->validateHierarchyChain($request);
         $data = $request->only($fields);
 
         // Normalize array-cast fields if comma-separated text is provided
@@ -187,6 +189,7 @@ class personnelcontroller extends Controller
             'sex' => 'required',
             'personnel_image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
+        $this->validateHierarchyChain($request);
 
         $fields = (new Personnel())->getFillable();
         $data = $request->only($fields);
@@ -765,5 +768,58 @@ class personnelcontroller extends Controller
         $path = Storage::path('personnel.csv');
 
         return response()->file($path);
+    }
+
+    private function validateHierarchyChain(Request $request): void
+    {
+        $ghqId = $request->input('ghq_id');
+        $serviceHqId = $request->input('service_hq_id');
+        $commandHqId = $request->input('command_hq_id');
+        $unitId = $request->input('unit_id');
+
+        if ($serviceHqId) {
+            $serviceHq = ServiceHq::query()->find($serviceHqId);
+            if (! $serviceHq) {
+                throw ValidationException::withMessages([
+                    'service_hq_id' => 'The selected Service HQ does not exist.',
+                ]);
+            }
+
+            if ($ghqId && (string) $serviceHq->ghq_id !== (string) $ghqId) {
+                throw ValidationException::withMessages([
+                    'service_hq_id' => 'The selected Service HQ does not belong to the selected GHQ.',
+                ]);
+            }
+        }
+
+        if ($commandHqId) {
+            $commandHq = CommandHq::query()->find($commandHqId);
+            if (! $commandHq) {
+                throw ValidationException::withMessages([
+                    'command_hq_id' => 'The selected Command HQ does not exist.',
+                ]);
+            }
+
+            if ($serviceHqId && (string) $commandHq->service_hq_id !== (string) $serviceHqId) {
+                throw ValidationException::withMessages([
+                    'command_hq_id' => 'The selected Command HQ does not belong to the selected Service HQ.',
+                ]);
+            }
+        }
+
+        if ($unitId) {
+            $unit = Unit::query()->find($unitId);
+            if (! $unit) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'The selected Unit does not exist.',
+                ]);
+            }
+
+            if ($commandHqId && (string) $unit->command_hq_id !== (string) $commandHqId) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'The selected Unit does not belong to the selected Command HQ.',
+                ]);
+            }
+        }
     }
 }

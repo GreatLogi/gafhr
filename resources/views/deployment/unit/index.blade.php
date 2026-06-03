@@ -51,6 +51,9 @@
                                                 </div>
                                             </th>
                                             <th>NAME</th>
+                                            <th>GHQ</th>
+                                            <th>SERVICE HQ</th>
+                                            <th>COMMAND HQ</th>
                                             <th width="20%">ACTION</th>
                                         </tr>
                                     </thead>
@@ -58,7 +61,10 @@
                                         @foreach ($units as $key => $record)
                                             <tr>
                                                 <td>{{ $key + 1 }}</td>
-                                                <td>{{ $record->unit_name }}</td>
+                                                <td>{{ $record->unit_name ?? $record->unit }}</td>
+                                                <td>{{ $record->commandHq?->serviceHq?->ghq?->name ?? '-' }}</td>
+                                                <td>{{ $record->commandHq?->serviceHq?->service_name ?? '-' }}</td>
+                                                <td>{{ $record->commandHq?->command_name ?? '-' }}</td>
                                                 <td>
                                                     <a class="btn btn-primary btn-sm"
                                                         href="{{ route('edit-unit', $record->uuid) }}"><i

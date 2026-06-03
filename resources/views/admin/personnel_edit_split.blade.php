@@ -49,13 +49,14 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #d9b26a 0%, #b8865a 100%);
-            border: none;
+            background: #b8865a;
+            border: 1px solid #b8865a;
             border-radius: 10px;
         }
 
         .btn-primary:hover {
-            background: linear-gradient(135deg, #cfa45c 0%, #a6774f 100%);
+            background: #a6774f;
+            border-color: #a6774f;
         }
     </style>
 
@@ -198,7 +199,7 @@
                                             </select>
                                         @elseif ($field === 'service_hq_id')
                                             <select class="form-select form-control hierarchy-filter" id="{{ $field }}" name="{{ $field }}"
-                                                data-parent="ghq_id" data-child-key="ghq_id">
+                                                data-parent="ghq_id" data-child-key="ghq_id" data-require-parent="true">
                                                 <option value="">Select</option>
                                                 @foreach ($serviceHqs as $serviceHq)
                                                     <option value="{{ $serviceHq->id }}" data-ghq-id="{{ $serviceHq->ghq_id }}"
@@ -209,7 +210,7 @@
                                             </select>
                                         @elseif ($field === 'command_hq_id')
                                             <select class="form-select form-control hierarchy-filter" id="{{ $field }}" name="{{ $field }}"
-                                                data-parent="service_hq_id" data-child-key="service_hq_id">
+                                                data-parent="service_hq_id" data-child-key="service_hq_id" data-require-parent="true">
                                                 <option value="">Select</option>
                                                 @foreach ($commandHqs as $commandHq)
                                                     <option value="{{ $commandHq->id }}" data-service-hq-id="{{ $commandHq->service_hq_id }}"
@@ -220,7 +221,7 @@
                                             </select>
                                         @elseif ($field === 'unit_id')
                                             <select class="form-select form-control" id="{{ $field }}" name="{{ $field }}"
-                                                data-parent="command_hq_id" data-child-key="command_hq_id">
+                                                data-parent="command_hq_id" data-child-key="command_hq_id" data-require-parent="true">
                                                 <option value="">Select</option>
                                                 @foreach ($units as $unit)
                                                     <option value="{{ $unit->id }}" data-command-hq-id="{{ $unit->command_hq_id }}"
@@ -479,6 +480,7 @@
 
                 const parent = document.getElementById(parentId);
                 const parentValue = String(parent?.value || '');
+                const requireParent = selectEl.dataset.requireParent === 'true';
                 Array.from(selectEl.options).forEach((opt, index) => {
                     if (index === 0) {
                         opt.hidden = false;
@@ -487,12 +489,23 @@
 
                     const dataKey = `data-${childKey.replace(/_/g, '-')}`;
                     const optionValue = String(opt.getAttribute(dataKey) || '');
-                    const visible = !parentValue || optionValue === parentValue;
+                    const visible = requireParent ? (parentValue && optionValue === parentValue) : (!parentValue || optionValue === parentValue);
                     opt.hidden = !visible;
                     if (!visible && opt.selected) {
                         opt.selected = false;
                     }
                 });
+
+                selectEl.disabled = requireParent && !parentValue;
+            };
+
+            const syncChildren = function(parentId) {
+                hierarchySelects
+                    .filter((selectEl) => selectEl.dataset.parent === parentId)
+                    .forEach((selectEl) => {
+                        syncHierarchySelect(selectEl);
+                        syncChildren(selectEl.id);
+                    });
             };
 
             hierarchySelects.forEach((selectEl) => {
@@ -504,11 +517,14 @@
                 const parent = document.getElementById(parentId);
                 if (parent) {
                     parent.addEventListener('change', function () {
+                        selectEl.value = '';
                         syncHierarchySelect(selectEl);
+                        syncChildren(selectEl.id);
                     });
                 }
-                syncHierarchySelect(selectEl);
             });
+
+            syncChildren('ghq_id');
 
             document.addEventListener('click', function (e) {
                 const trigger = e.target.closest('.open-related-modal');

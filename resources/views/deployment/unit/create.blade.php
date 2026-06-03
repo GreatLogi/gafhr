@@ -1,58 +1,161 @@
 @extends('admin.admin_master')
 @section('admin')
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- [ breadcrumb ] start -->
+    <style>
+        .unit-form-card {
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 12px 28px rgba(47, 59, 74, 0.08);
+        }
+    </style>
+
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
                 <div class="col-md-12">
                     <div class="page-header-title">
-                        <h5 class="m-b-10">Units</h5>
+                        <h5 class="m-b-10">Add Unit</h5>
                     </div>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html"><i class="feather icon-home"></i></a></li>
-                        <li class="breadcrumb-item"><a href="#!">Details</a></li>
-                        <li class="breadcrumb-item"><a href="#!">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.index') }}"><i class="feather icon-home"></i></a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('view-unit') }}">Units</a></li>
+                        <li class="breadcrumb-item"><a href="#!">Create</a></li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
-    <!-- [ breadcrumb ] end -->
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="card">
-                <div class="card-body">
-                    <form action="{{ route('store-unit') }}" method="POST" id="myForm">
-                        @csrf
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group row">
-                                    <label for="name" class="col-sm-3 col-form-label">Enter Unit</label>
-                                    <div class="col-sm-9">
-                                        <input type="text" class="form-control" name="unit_name" placeholder="Unit">
-                                        @error('unit_name')
-                                            <span class="btn btn-danger">{{ $message }}</span>
-                                        @enderror
-                                    </div>
-                                </div>
+
+    <div class="card unit-form-card">
+        <div class="card-body">
+            <form action="{{ route('store-unit') }}" method="POST">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="unit_name">Unit Name</label>
+                        <input type="text" class="form-control" id="unit_name" name="unit_name"
+                            value="{{ old('unit_name') }}" placeholder="Enter unit name">
+                        @error('unit_name')
+                            <span class="text-danger small">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    @if ($supportsHierarchyChain)
+                        <div class="col-md-6">
+                            <label class="form-label" for="ghq_id">GHQ</label>
+                            <select class="form-control" id="ghq_id" name="ghq_id">
+                                <option value="">Select GHQ</option>
+                                @foreach ($ghqs as $ghq)
+                                    <option value="{{ $ghq->id }}" {{ old('ghq_id') == $ghq->id ? 'selected' : '' }}>
+                                        {{ $ghq->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('ghq_id')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="service_hq_id">Service HQ</label>
+                            <select class="form-control hierarchy-filter" id="service_hq_id" name="service_hq_id"
+                                data-parent="ghq_id" data-child-key="ghq_id" data-require-parent="true">
+                                <option value="">Select Service HQ</option>
+                                @foreach ($serviceHqs as $serviceHq)
+                                    <option value="{{ $serviceHq->id }}" data-ghq-id="{{ $serviceHq->ghq_id }}"
+                                        {{ old('service_hq_id') == $serviceHq->id ? 'selected' : '' }}>
+                                        {{ $serviceHq->service_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('service_hq_id')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="command_hq_id">Command HQ</label>
+                            <select class="form-control hierarchy-filter" id="command_hq_id" name="command_hq_id"
+                                data-parent="service_hq_id" data-child-key="service_hq_id" data-require-parent="true">
+                                <option value="">Select Command HQ</option>
+                                @foreach ($commandHqs as $commandHq)
+                                    <option value="{{ $commandHq->id }}" data-service-hq-id="{{ $commandHq->service_hq_id }}"
+                                        {{ old('command_hq_id') == $commandHq->id ? 'selected' : '' }}>
+                                        {{ $commandHq->command_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('command_hq_id')
+                                <span class="text-danger small">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    @else
+                        <div class="col-12">
+                            <div class="alert alert-warning mb-0">
+                                Unit hierarchy linking needs the `units.command_hq_id` column. Run the hierarchy migration to enable GHQ, Service HQ, and Command HQ linking here.
                             </div>
                         </div>
+                    @endif
                 </div>
-                <div class="col-md-6">
-                    <div class="form-group row">
-                        <div class="col-sm-10">
-                            <button type="submit" class="btn  btn-primary">Save</button>
-                        </div>
-                    </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="feather icon-save mr-1"></i>Save Unit
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
-    </form>
-    </div>
-    </div>
-    </div>
-    </div>
+    <script>
+        (function () {
+            const syncHierarchySelect = function(selectEl) {
+                const parentId = selectEl.dataset.parent;
+                const childKey = selectEl.dataset.childKey;
+                if (!parentId || !childKey) return;
+
+                const parent = document.getElementById(parentId);
+                const parentValue = String(parent?.value || '');
+                const requireParent = selectEl.dataset.requireParent === 'true';
+
+                Array.from(selectEl.options).forEach((opt, index) => {
+                    if (index === 0) {
+                        opt.hidden = false;
+                        return;
+                    }
+
+                    const dataKey = `data-${childKey.replace(/_/g, '-')}`;
+                    const optionValue = String(opt.getAttribute(dataKey) || '');
+                    const visible = requireParent ? (parentValue && optionValue === parentValue) : (!parentValue || optionValue === parentValue);
+                    opt.hidden = !visible;
+
+                    if (!visible && opt.selected) {
+                        opt.selected = false;
+                    }
+                });
+
+                selectEl.disabled = requireParent && !parentValue;
+            };
+
+            const hierarchySelects = Array.from(document.querySelectorAll('.hierarchy-filter'));
+
+            const syncChildren = function(parentId) {
+                hierarchySelects
+                    .filter((selectEl) => selectEl.dataset.parent === parentId)
+                    .forEach((selectEl) => {
+                        syncHierarchySelect(selectEl);
+                        syncChildren(selectEl.id);
+                    });
+            };
+
+            hierarchySelects.forEach((selectEl) => {
+                const parent = document.getElementById(selectEl.dataset.parent);
+                if (parent) {
+                    parent.addEventListener('change', function() {
+                        selectEl.value = '';
+                        syncHierarchySelect(selectEl);
+                        syncChildren(selectEl.id);
+                    });
+                }
+            });
+
+            syncChildren('ghq_id');
+        })();
+    </script>
 @endsection
