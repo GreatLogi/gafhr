@@ -15,6 +15,7 @@ use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\DatabaseNotificationCollection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Lab404\Impersonate\Models\Impersonate;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -61,6 +62,8 @@ use Spatie\Permission\Traits\HasRoles;
  */
 final class User extends Authenticatable
 {
+    private static ?array $hierarchyScopeColumns = null;
+
     use HasApiTokens;
     use HasFactory;
     use InteractsWithUuid;
@@ -243,8 +246,14 @@ final class User extends Authenticatable
             'department_id',
             'ghq_id',
         ] as $column) {
-            if (! empty($this->{$column})) {
-                return [$column, $this->{$column}];
+            if (! $this->hasHierarchyScopeColumn('users', $column)) {
+                continue;
+            }
+
+            $value = $this->getAttribute($column);
+
+            if (! empty($value)) {
+                return [$column, $value];
             }
         }
 
@@ -259,6 +268,10 @@ final class User extends Authenticatable
             return $query;
         }
 
+        if (! $this->hasHierarchyScopeColumn('personnel', $column)) {
+            return $query;
+        }
+
         return $query->where($column, $value);
     }
 
@@ -270,6 +283,25 @@ final class User extends Authenticatable
             return true;
         }
 
+        if (! $this->hasHierarchyScopeColumn('personnel', $column)) {
+            return true;
+        }
+
         return (string) $personnel->{$column} === (string) $value;
+    }
+
+    private function hasHierarchyScopeColumn(string $table, string $column): bool
+    {
+        if (self::$hierarchyScopeColumns === null) {
+            self::$hierarchyScopeColumns = [];
+        }
+
+        $cacheKey = $table . '.' . $column;
+
+        if (! array_key_exists($cacheKey, self::$hierarchyScopeColumns)) {
+            self::$hierarchyScopeColumns[$cacheKey] = Schema::hasColumn($table, $column);
+        }
+
+        return self::$hierarchyScopeColumns[$cacheKey];
     }
 }

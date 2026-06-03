@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\GAFTOTRAVELRECORD;
 use App\Models\Personnel;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 use Yajra\DataTables\DataTables;
 
 class RecordManagerController extends Controller
@@ -21,7 +22,7 @@ class RecordManagerController extends Controller
     public function PersonnelData()
     {
         $user = auth()->user();
-        $data = $user->scopePersonnelQuery(Personnel::with('organic_unit'))->select([
+        $selectColumns = array_values(array_filter([
             'id',
             'uuid',
             'service_no',
@@ -33,13 +34,15 @@ class RecordManagerController extends Controller
             'arm_of_service',
             'present_rank',
             'unit_id',
-            'ghq_id',
-            'department_id',
-            'directorate_id',
-            'service_hq_id',
-            'command_hq_id',
+            Schema::hasColumn('personnel', 'ghq_id') ? 'ghq_id' : null,
+            Schema::hasColumn('personnel', 'department_id') ? 'department_id' : null,
+            Schema::hasColumn('personnel', 'directorate_id') ? 'directorate_id' : null,
+            Schema::hasColumn('personnel', 'service_hq_id') ? 'service_hq_id' : null,
+            Schema::hasColumn('personnel', 'command_hq_id') ? 'command_hq_id' : null,
             'status',
-        ]);
+        ]));
+
+        $data = $user->scopePersonnelQuery(Personnel::with('organic_unit'))->select($selectColumns);
 
         return DataTables::of($data)
             ->addColumn('full_name', function ($row) {
