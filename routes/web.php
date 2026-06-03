@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\GeneralReportController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\countrycontroller;
+use App\Http\Controllers\HrHierarchyController;
 use App\Http\Controllers\LogactivityController;
 use App\Http\Controllers\ManageUserAccountController;
 use App\Http\Controllers\OTPController;
@@ -41,10 +42,9 @@ Route::prefix('reports')->group(function () {
     Route::get('/api-main-report', [GeneralReportController::class, 'report'])->name('web-main-report');
 });
 Route::group(['prefix' => 'settings'], function () {
+    Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::resource('roles', RoleController::class, ['names' => 'roles']);
     Route::resource('users', UserController::class, ['names' => 'users']);
-    Route::get('/forgot-password', [PagesController::class, 'resetpassword'])->name('forgot-password');
-    Route::post('/forgot-password', [PagesController::class, 'resetpasswordSubmit'])->name('forgot-password.submit');
     Route::get('/change-password', [PagesController::class, 'verifyaccount'])->name('verify-password');
     Route::post('/password-changed', [ManageUserAccountController::class, 'changePassword'])->name('changed-password');
     Route::prefix('Profile')->group(function () {
@@ -81,6 +81,23 @@ Route::prefix('gaf-hr')->group(function () {
         Route::prefix('records')->group(function () {
             Route::get('/', [TrackTravelController::class, 'View'])->name('view-record');
             Route::get('/mech', [personnelController::class, 'adminCreate'])->name('create-record');
+            Route::get('/hierarchy/mech', [HrHierarchyController::class, 'index'])->name('hierarchy.mech');
+            Route::get('/hierarchy/ghq', [HrHierarchyController::class, 'ghqs'])->name('hierarchy.ghq.index');
+            Route::post('/hierarchy/ghq', [HrHierarchyController::class, 'storeGhq'])->name('hierarchy.ghq.store');
+            Route::get('/hierarchy/ghq/{uuid}/edit', [HrHierarchyController::class, 'editGhq'])->name('hierarchy.ghq.edit');
+            Route::post('/hierarchy/ghq/{uuid}', [HrHierarchyController::class, 'updateGhq'])->name('hierarchy.ghq.update');
+            Route::get('/hierarchy/directorate', [HrHierarchyController::class, 'directorates'])->name('hierarchy.directorate.index');
+            Route::post('/hierarchy/directorate', [HrHierarchyController::class, 'storeDirectorate'])->name('hierarchy.directorate.store');
+            Route::get('/hierarchy/directorate/{uuid}/edit', [HrHierarchyController::class, 'editDirectorate'])->name('hierarchy.directorate.edit');
+            Route::post('/hierarchy/directorate/{uuid}', [HrHierarchyController::class, 'updateDirectorate'])->name('hierarchy.directorate.update');
+            Route::get('/hierarchy/service-hq', [HrHierarchyController::class, 'serviceHqs'])->name('hierarchy.service-hq.index');
+            Route::post('/hierarchy/service-hq', [HrHierarchyController::class, 'storeServiceHq'])->name('hierarchy.service-hq.store');
+            Route::get('/hierarchy/service-hq/{uuid}/edit', [HrHierarchyController::class, 'editServiceHq'])->name('hierarchy.service-hq.edit');
+            Route::post('/hierarchy/service-hq/{uuid}', [HrHierarchyController::class, 'updateServiceHq'])->name('hierarchy.service-hq.update');
+            Route::get('/hierarchy/command-hq', [HrHierarchyController::class, 'commandHqs'])->name('hierarchy.command-hq.index');
+            Route::post('/hierarchy/command-hq', [HrHierarchyController::class, 'storeCommandHq'])->name('hierarchy.command-hq.store');
+            Route::get('/hierarchy/command-hq/{uuid}/edit', [HrHierarchyController::class, 'editCommandHq'])->name('hierarchy.command-hq.edit');
+            Route::post('/hierarchy/command-hq/{uuid}', [HrHierarchyController::class, 'updateCommandHq'])->name('hierarchy.command-hq.update');
             Route::post('/mech', [personnelController::class, 'adminStore'])->name('admin.personnel.store');
             Route::get('/mech-travel', [TrackTravelController::class, 'create'])->name('create-record-travel');
             Route::get('/mech-civilian', [TrackTravelController::class, 'create_civilian'])->name('create-civilian-record');

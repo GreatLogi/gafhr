@@ -23,6 +23,9 @@ final class Department extends Model
      */
     protected $fillable = [
         'department',
+        'ghq_id',
+        'dept_code',
+        'description',
         'arm_of_service',
         'command',
     ];
@@ -45,5 +48,15 @@ final class Department extends Model
     public function appointments()
     {
         return $this->hasMany(Appointment::class);
+    }
+
+    public function ghq()
+    {
+        return $this->belongsTo(Ghq::class);
+    }
+
+    public function personnel()
+    {
+        return $this->hasMany(Personnel::class);
     }
 }

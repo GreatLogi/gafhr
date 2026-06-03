@@ -53,7 +53,7 @@ class PersonnelIntegrationController extends Controller
             'gender' => $personnel->sex,
             'mobile_no' => $personnel->phone,
             'blood_group' => $personnel->blood_group,
-            'unit_id' => $personnel->organic_unit->unit ?? $personnel->unit_id,
+            'unit_id' => $personnel->organic_unit->unit_name ?? $personnel->organic_unit->unit ?? $personnel->unit_id,
             'email' => $personnel->email,
             'personnel_image' => $personnel->personnel_image,
             'service_category' => $personnel->level,

@@ -53,7 +53,7 @@ class RecordManagerController extends Controller
                 };
             })
             ->addColumn('unit_name', function ($row) {
-                return $row->organic_unit->unit ?? $row->unit_id;
+                return $row->organic_unit->unit_name ?? $row->organic_unit->unit ?? $row->unit_id;
             })
             ->addColumn('action', function ($row) {
                 return '<a href="' . route('admin.personnel.edit', $row->uuid) . '" class="btn btn-sm btn-primary">Edit</a>';

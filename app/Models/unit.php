@@ -22,7 +22,13 @@ final class Unit extends Model
      */
     protected $fillable = [
         'unit',
+        'unit_name',
+        'unit_code',
+        'unit_type',
         'arm_of_service',
+        'command_hq_id',
+        'created_by',
+        'updated_by',
         'uuid',
         'attached_units',
     ];
@@ -39,5 +45,10 @@ final class Unit extends Model
     public function attached_units()
     {
         return $this->hasMany(AttachedUnit::class);
+    }
+
+    public function commandHq()
+    {
+        return $this->belongsTo(CommandHq::class);
     }
 }

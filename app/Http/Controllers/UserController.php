@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
@@ -27,9 +28,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.view')) {
-            abort(403, 'Sorry !! You are Unauthorized to view any user !');
-        }
+       
         $inactiveUsers = User::where('status', 0)->get();
         if ($inactiveUsers->isNotEmpty()) {
             $alertMessage = 'The following user account is  inactive: ';
@@ -52,9 +51,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.create')) {
-            abort(403, 'Sorry !! You are Unauthorized to create any user !');
-        }
+       
         $roles = Role::all();
 
         return view('systemsetting.users.create', compact('roles'));
@@ -67,9 +64,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.create')) {
-            abort(403, 'Sorry !! You are Unauthorized to create any user !');
-        }
+       
         // Validation Data
         $request->validate([
             'name' => 'required|max:50|unique:users',
@@ -77,18 +72,22 @@ class UserController extends Controller
         ]);
         // Create New Admin
         $user = new User();
-        $code = rand(0000, 9999);
+        $temporaryPassword = (string) random_int(10000000, 99999999);
         $user->name = $request->name;
         $user->email = $request->email;
         $user->status = '1';
-        $user->password = bcrypt($code);
-        $user->code = $code;
+        $user->password = bcrypt($temporaryPassword);
+        $user->password_changed_at = null;
+        $user->password_expiry = Carbon::now()->subSecond();
         $user->save();
         $user->roles()->detach();
         if ($request->roles) {
             $user->assignRole($request->roles);
         }
-        session()->flash('success', 'User has been created !!');
+        session()->flash(
+            'success',
+            "User has been created. Temporary password for {$user->name} is {$temporaryPassword}."
+        );
         return redirect()->route('users.index');
     }
 
@@ -111,9 +110,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.edit')) {
-            abort(403, 'Sorry !! You are Unauthorized to delete any user !');
-        }
+       
         $user = User::find($id);
         $roles = Role::all();
 
@@ -128,9 +125,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.edit')) {
-            abort(403, 'Sorry !! You are Unauthorized to delete any user !');
-        }
+       
         // Create New User
         $user = User::find($id);
         // Validation Data
@@ -150,6 +145,23 @@ class UserController extends Controller
         return back();
     }
 
+    public function resetPassword(User $user)
+    {
+        $temporaryPassword = (string) random_int(10000000, 99999999);
+
+        $user->password = bcrypt($temporaryPassword);
+        $user->password_changed_at = null;
+        $user->password_expiry = Carbon::now()->subSecond();
+        $user->save();
+
+        session()->flash(
+            'success',
+            "Temporary password for {$user->name} is {$temporaryPassword}. The user must change it after login."
+        );
+
+        return redirect()->route('users.index');
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -158,9 +170,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if (is_null($this->user) || !$this->user->can('superadmin.delete')) {
-            abort(403, 'Sorry !! You are Unauthorized to delete any user !');
-        }
+       
         $user = User::find($id);
         if (!is_null($user)) {
             $user->delete();

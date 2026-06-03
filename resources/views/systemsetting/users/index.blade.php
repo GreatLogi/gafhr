@@ -1,5 +1,6 @@
 @extends('admin.admin_master')
 @section('admin')
+    @php($currentUser = Auth::guard('web')->user())
     <div class="page-header">
         <div class="page-block">
             <div class="row align-items-center">
@@ -27,10 +28,10 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="header-title float-left">Users List</h4>
+                    <h4 class="float-left header-title">Users List</h4>
                     <p class="float-right mb-2">
-                        @if (Auth::guard('web')->user()->can('role.create'))
-                            <a class="btn btn-primary text-white" href="{{ route('users.create') }}">Create New User</a>
+                        @if ($currentUser && $currentUser->can('role.create'))
+                            <a class="text-white btn btn-primary" href="{{ route('users.create') }}">Create New User</a>
                         @endif
                     </p>
                     <div class="clearfix"></div>
@@ -42,8 +43,8 @@
                                     <th width="5%">Sl</th>
                                     <th width="10%">Name</th>
                                     <th width="10%">Email</th>
-                                    <th width="10%">Code</th>
-                                    <th width="10%">Status</th>
+                                    <th width="12%">Status</th>
+                                    <th width="12%">Password</th>
                                     <th width="15%">Roles</th>
                                     <th width="15%">Action</th>
                                 </tr>
@@ -54,7 +55,6 @@
                                         <td>{{ $loop->index + 1 }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->email }}</td>
-                                        <td>{{ $user->code }}</td>
                                         <td>
                                             @if ($user->status == 0)
                                                 <a href="{{ route('user.inactive', $user->id) }}"
@@ -67,40 +67,57 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if (!$user->password_changed_at)
+                                                <span class="badge badge-warning">Must change password</span>
+                                            @elseif ($user->password_expiry && $user->password_expiry < now())
+                                                <span class="badge badge-danger">Password expired</span>
+                                            @else
+                                                <span class="badge badge-success">Password updated</span>
+                                            @endif
+                                        </td>
+                                        <td>
                                             @foreach ($user->roles as $role)
-                                                <span class="badge badge-info mr-1">
+                                                <span class="mr-1 badge badge-info">
                                                     {{ $role->name }}
                                                 </span>
                                             @endforeach
                                         </td>
 
                                         <td>
-                                            @if (Auth::guard('web')->user()->can('superadmin.edit'))
-                                                <a class="btn btn-success text-white"
+                                    
+                                                <a class="text-white btn btn-success"
                                                     href="{{ route('users.edit', $user->id) }}">Edit</a>
-                                            @endif
 
-                                            @if (Auth::guard('web')->user()->can('superadmin.delete'))
-                                                <a class="btn btn-danger text-white"
-                                                    href="{{ route('users.destroy', $user->id) }}"
-                                                    onclick="event.preventDefault(); confirmDelete('{{ $user->id }}');">
-                                                    Delete
-                                                </a>
-                                                <form id="delete-form-{{ $user->id }}"
-                                                    action="{{ route('users.destroy', $user->id) }}" method="POST"
-                                                    style="display: none;">
-                                                    @method('DELETE')
+                                                <form action="{{ route('users.reset-password', $user->id) }}"
+                                                    method="POST" style="display: inline-block;"
+                                                    onsubmit="return confirm('Reset this user password and require a change on next login?');">
                                                     @csrf
+                                                    <button type="submit" class="btn btn-warning text-dark">Reset
+                                                        Password</button>
                                                 </form>
+                                            
 
-                                                <script>
-                                                    function confirmDelete(userId) {
-                                                        if (confirm("Are you sure you want to delete this user?")) {
-                                                            document.getElementById('delete-form-' + userId).submit();
-                                                        }
+
+                                            <a class="text-white btn btn-danger"
+                                                href="{{ route('users.destroy', $user->id) }}"
+                                                onclick="event.preventDefault(); confirmDelete('{{ $user->id }}');">
+                                                Delete
+                                            </a>
+                                            <form id="delete-form-{{ $user->id }}"
+                                                action="{{ route('users.destroy', $user->id) }}" method="POST"
+                                                style="display: none;">
+                                                @method('DELETE')
+                                                @csrf
+                                            </form>
+
+                                            <script>
+                                                function confirmDelete(userId) {
+                                                    if (confirm("Are you sure you want to delete this user?")) {
+                                                        document.getElementById('delete-form-' + userId).submit();
                                                     }
-                                                </script>
-                                            @endif
+                                                }
+                                            </script>
+
                                         </td>
                                     </tr>
                                 @endforeach
@@ -129,8 +146,8 @@
 
     <script>
         /*================================
-                            datatable active
-                            ==================================*/
+                                datatable active
+                                ==================================*/
         if ($('#dataTable').length) {
             $('#dataTable').DataTable({
                 responsive: true

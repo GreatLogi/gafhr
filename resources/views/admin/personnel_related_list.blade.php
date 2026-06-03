@@ -321,7 +321,7 @@
                                     <select class="form-select" name="post_from">
                                         <option value="">Select</option>
                                         @foreach ($units as $unit)
-                                            <option value="{{ $unit->id }}">{{ $unit->unit ?? $unit->id }}</option>
+                                            <option value="{{ $unit->id }}">{{ $unit->unit_name ?? $unit->unit ?? $unit->id }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -330,7 +330,7 @@
                                     <select class="form-select" name="post_to">
                                         <option value="">Select</option>
                                         @foreach ($units as $unit)
-                                            <option value="{{ $unit->id }}">{{ $unit->unit ?? $unit->id }}</option>
+                                            <option value="{{ $unit->id }}">{{ $unit->unit_name ?? $unit->unit ?? $unit->id }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -450,9 +450,9 @@
                                             ({{ $item->relation }})
                                         @endif
                                     @elseif ($title === 'Posts')
-                                        {{ $item->posted_from->unit ?? $item->post_from ?? 'N/A' }}
+                                        {{ $item->posted_from->unit_name ?? $item->posted_from->unit ?? $item->post_from ?? 'N/A' }}
                                         ->
-                                        {{ $item->posted_to->unit ?? $item->post_to ?? 'N/A' }}
+                                        {{ $item->posted_to->unit_name ?? $item->posted_to->unit ?? $item->post_to ?? 'N/A' }}
                                     @elseif ($title === 'Remarks')
                                         {{ $item->remark ?? 'N/A' }}
                                     @else

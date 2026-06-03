@@ -57,6 +57,11 @@ final class Personnel extends Model
         'rank_on_commission',
         'present_rank',
         'present_rank_date',
+        'ghq_id',
+        'department_id',
+        'directorate_id',
+        'service_hq_id',
+        'command_hq_id',
         'unit_id',
         'attached_unit',
         'rtu',
@@ -158,6 +163,11 @@ final class Personnel extends Model
         return $this->belongsTo(Unit::class, 'unit_id', 'id');
     }
 
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+    }
+
     public function present_unit()
     {
         return $this->belongsTo(Unit::class, 'present_location', 'id');
@@ -171,6 +181,31 @@ final class Personnel extends Model
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id', 'id');
+    }
+
+    public function ghq()
+    {
+        return $this->belongsTo(Ghq::class);
+    }
+
+    public function department()
+    {
+        return $this->belongsTo(Department::class);
+    }
+
+    public function directorate()
+    {
+        return $this->belongsTo(Directorate::class);
+    }
+
+    public function serviceHq()
+    {
+        return $this->belongsTo(ServiceHq::class);
+    }
+
+    public function commandHq()
+    {
+        return $this->belongsTo(CommandHq::class);
     }
 
     public function trade()
@@ -203,6 +238,16 @@ final class Personnel extends Model
     public function current_rank()
     {
         return $this->hasOne(Rank::class, 'rank_code', 'present_rank');
+    }
+
+    public function rank()
+    {
+        return $this->hasOne(Rank::class, 'rank_code', 'present_rank');
+    }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'arm_of_service', 'id');
     }
 
     public function commission_rank()

@@ -162,13 +162,62 @@
                                                 <option value="ACTING">ACTING</option>
                                                 <option value="SUBSTANTIVE">SUBSTANTIVE</option>
                                             </select>
-                                        @elseif ($field === 'unit_id')
+                                        @elseif ($field === 'ghq_id')
                                             <select class="form-select form-control" id="{{ $field }}"
                                                 name="{{ $field }}">
                                                 <option value="">Select</option>
+                                                @foreach ($ghqs as $ghq)
+                                                    <option value="{{ $ghq->id }}">{{ $ghq->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        @elseif ($field === 'department_id')
+                                            <select class="form-select form-control hierarchy-filter" id="{{ $field }}"
+                                                name="{{ $field }}" data-parent="ghq_id" data-child-key="ghq_id">
+                                                <option value="">Select</option>
+                                                @foreach ($departments as $department)
+                                                    <option value="{{ $department->id }}"
+                                                        data-ghq-id="{{ $department->ghq_id }}">
+                                                        {{ $department->department ?? $department->id }}</option>
+                                                @endforeach
+                                            </select>
+                                        @elseif ($field === 'directorate_id')
+                                            <select class="form-select form-control hierarchy-filter" id="{{ $field }}"
+                                                name="{{ $field }}" data-parent="ghq_id" data-child-key="ghq_id">
+                                                <option value="">Select</option>
+                                                @foreach ($directorates as $directorate)
+                                                    <option value="{{ $directorate->id }}"
+                                                        data-ghq-id="{{ $directorate->ghq_id }}">
+                                                        {{ $directorate->directorate_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        @elseif ($field === 'service_hq_id')
+                                            <select class="form-select form-control hierarchy-filter" id="{{ $field }}"
+                                                name="{{ $field }}" data-parent="ghq_id" data-child-key="ghq_id">
+                                                <option value="">Select</option>
+                                                @foreach ($serviceHqs as $serviceHq)
+                                                    <option value="{{ $serviceHq->id }}"
+                                                        data-ghq-id="{{ $serviceHq->ghq_id }}">
+                                                        {{ $serviceHq->service_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        @elseif ($field === 'command_hq_id')
+                                            <select class="form-select form-control hierarchy-filter" id="{{ $field }}"
+                                                name="{{ $field }}" data-parent="service_hq_id" data-child-key="service_hq_id">
+                                                <option value="">Select</option>
+                                                @foreach ($commandHqs as $commandHq)
+                                                    <option value="{{ $commandHq->id }}"
+                                                        data-service-hq-id="{{ $commandHq->service_hq_id }}">
+                                                        {{ $commandHq->command_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        @elseif ($field === 'unit_id')
+                                            <select class="form-select form-control" id="{{ $field }}"
+                                                name="{{ $field }}" data-parent="command_hq_id" data-child-key="command_hq_id">
+                                                <option value="">Select</option>
                                                 @foreach ($units as $unit)
-                                                    <option value="{{ $unit->id }}">
-                                                        {{ $unit->unit ?? $unit->id }}</option>
+                                                    <option value="{{ $unit->id }}"
+                                                        data-command-hq-id="{{ $unit->command_hq_id }}">
+                                                        {{ $unit->unit_name ?? $unit->unit ?? $unit->id }}</option>
                                                 @endforeach
                                             </select>
                                         @elseif ($field === 'attached_unit')
@@ -177,7 +226,7 @@
                                                 <option value="">Select</option>
                                                 @foreach ($units as $unit)
                                                     <option value="{{ $unit->id }}">
-                                                        {{ $unit->unit ?? $unit->id }}</option>
+                                                        {{ $unit->unit_name ?? $unit->unit ?? $unit->id }}</option>
                                                 @endforeach
                                             </select>
                                         @elseif ($field === 'branch_id')
@@ -291,7 +340,7 @@
                                                 @endforeach
                                             </select>
                                         @elseif ($field === 'languages_spoken')
-                                            <select class="form-select form-control" id="{{ $field }}" name="{{ $field }}[]" multiple>
+                                            <select class="form-select form-control select2-multiple" id="{{ $field }}" name="{{ $field }}[]" multiple data-placeholder="Select languages spoken">
                                                 <option value="AKAN (TWI)">AKAN (TWI)</option>
                                                 <option value="FANTE">FANTE</option>
                                                 <option value="EWE">EWE</option>
@@ -310,9 +359,9 @@
                                                 <option value="SISSALA">SISSALA</option>
                                                 <option value="FRAFRA">FRAFRA</option>
                                             </select>
-                                            <small class="text-muted">Hold Ctrl/Command to select multiple.</small>
+                                            <small class="text-muted">You can select multiple values.</small>
                                         @elseif ($field === 'hobbies')
-                                            <select class="form-select form-control" id="{{ $field }}" name="{{ $field }}[]" multiple>
+                                            <select class="form-select form-control select2-multiple" id="{{ $field }}" name="{{ $field }}[]" multiple data-placeholder="Select hobbies">
                                                 <option value="FOOTBALL">FOOTBALL</option>
                                                 <option value="READING">READING</option>
                                                 <option value="MUSIC">MUSIC</option>
@@ -331,7 +380,7 @@
                                                 <option value="CYCLING">CYCLING</option>
                                                 <option value="CHESS">CHESS</option>
                                             </select>
-                                            <small class="text-muted">Hold Ctrl/Command to select multiple.</small>
+                                            <small class="text-muted">You can select multiple values.</small>
                                         @else
                                             <input type="{{ $type }}" class="form-control"
                                                 id="{{ $field }}" name="{{ $field }}"
@@ -360,6 +409,7 @@
             const serviceSelect = document.getElementById('arm_of_service');
             const rankSelect = document.getElementById('present_rank');
             const rankCommissionSelect = document.getElementById('rank_on_commission');
+            const hierarchySelects = Array.from(document.querySelectorAll('.hierarchy-filter, #unit_id'));
 
             if (!regionSelect || !districtSelect) {
                 return;
@@ -418,6 +468,56 @@
                     reader.readAsDataURL(file);
                 });
             }
+
+            if (window.jQuery && window.jQuery.fn.select2) {
+                window.jQuery('.select2-multiple').select2({
+                    width: '100%',
+                    theme: 'bootstrap4',
+                    placeholder: function() {
+                        return window.jQuery(this).data('placeholder') || 'Select values';
+                    }
+                });
+            }
+
+            const syncHierarchySelect = function(selectEl) {
+                const parentId = selectEl.dataset.parent;
+                const childKey = selectEl.dataset.childKey;
+                if (!parentId || !childKey) {
+                    return;
+                }
+
+                const parent = document.getElementById(parentId);
+                const parentValue = String(parent?.value || '');
+                Array.from(selectEl.options).forEach((opt, index) => {
+                    if (index === 0) {
+                        opt.hidden = false;
+                        return;
+                    }
+
+                    const dataKey = `data-${childKey.replace(/_/g, '-')}`;
+                    const optionValue = String(opt.getAttribute(dataKey) || '');
+                    const visible = !parentValue || optionValue === parentValue;
+                    opt.hidden = !visible;
+                    if (!visible && opt.selected) {
+                        opt.selected = false;
+                    }
+                });
+            };
+
+            hierarchySelects.forEach((selectEl) => {
+                const parentId = selectEl.dataset.parent;
+                if (!parentId) {
+                    return;
+                }
+
+                const parent = document.getElementById(parentId);
+                if (parent) {
+                    parent.addEventListener('change', function() {
+                        syncHierarchySelect(selectEl);
+                    });
+                }
+                syncHierarchySelect(selectEl);
+            });
         })();
     </script>
 @endsection

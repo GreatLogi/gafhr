@@ -10,9 +10,14 @@ use App\Models\Denomination;
 use App\Models\Appointment;
 use App\Models\Profession;
 use App\Models\Branch;
+use App\Models\CommandHq;
+use App\Models\Department;
+use App\Models\Directorate;
+use App\Models\Ghq;
 use App\Models\Trade;
 use App\Models\rank;
 use App\Models\Service;
+use App\Models\ServiceHq;
 use App\Models\Unit;
 use Auth;
 use Illuminate\Http\Request;
@@ -55,6 +60,11 @@ class personnelcontroller extends Controller
         $professions = Profession::all();
         $branches = Branch::all();
         $trades = Trade::all();
+        $ghqs = Ghq::orderBy('name')->get();
+        $departments = Department::orderBy('department')->get();
+        $directorates = Directorate::orderBy('directorate_name')->get();
+        $serviceHqs = ServiceHq::orderBy('service_name')->get();
+        $commandHqs = CommandHq::orderBy('command_name')->get();
 
         return view('admin.personnel_mech', compact(
             'fields',
@@ -66,7 +76,12 @@ class personnelcontroller extends Controller
             'appointments',
             'professions',
             'branches',
-            'trades'
+            'trades',
+            'ghqs',
+            'departments',
+            'directorates',
+            'serviceHqs',
+            'commandHqs'
         ));
     }
 
@@ -130,6 +145,11 @@ class personnelcontroller extends Controller
         $professions = Profession::all();
         $branches = Branch::all();
         $trades = Trade::all();
+        $ghqs = Ghq::orderBy('name')->get();
+        $departments = Department::orderBy('department')->get();
+        $directorates = Directorate::orderBy('directorate_name')->get();
+        $serviceHqs = ServiceHq::orderBy('service_name')->get();
+        $commandHqs = CommandHq::orderBy('command_name')->get();
 
         return view('admin.personnel_edit_split', compact(
             'personnel',
@@ -142,7 +162,12 @@ class personnelcontroller extends Controller
             'appointments',
             'professions',
             'branches',
-            'trades'
+            'trades',
+            'ghqs',
+            'departments',
+            'directorates',
+            'serviceHqs',
+            'commandHqs'
         ));
     }
 

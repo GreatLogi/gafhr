@@ -31,8 +31,7 @@
 
                 <li class="nav-item pcoded-hasmenu">
                     <a href="#!" class="nav-link "><span class="pcoded-micon"><i
-                                class="feather icon-list"></i></span><span
-                                class="pcoded-mtext">Records</span></a>
+                                class="feather icon-list"></i></span><span class="pcoded-mtext">Records</span></a>
                     <ul class="pcoded-submenu">
                         <li><a href="{{ route('record-manager') }}">Records Manager</a></li>
                         <li><a href="{{ route('create-record') }}"> Add New</a></li>
@@ -48,17 +47,17 @@
                 <li class="nav-item pcoded-hasmenu">
                     <a href="#!" class="nav-link "><span class="pcoded-micon"><i
                                 class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Generate
-                                Report</span></a>
+                            Report</span></a>
                     <ul class="pcoded-submenu">
                         <li><a href="{{ route('system-report') }}">Master Filter</a></li>
 
                     </ul>
                 </li>
-                @can('superadmin.view')
+              
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-plus"></i></span><span
-                                    class="pcoded-mtext">Mechanizations</span></a>
+                                class="pcoded-mtext">Mechanizations</span></a>
                         <ul class="pcoded-submenu">
                             <li class="nav-item pcoded-hasmenu">
                                 <a href="{{ route('personal-view') }}" class="nav-link "><span
@@ -77,15 +76,17 @@
                                 <a href="{{ route('arm-view') }}" class="nav-link "><span class="pcoded-mtext">Arm
                                         of Service</span></a>
                             </li>
+                            <li class="nav-item pcoded-hasmenu">
+                                <a href="{{ route('hierarchy.mech') }}" class="nav-link "><span
+                                        class="pcoded-mtext">HR Hierarchy</span></a>
+                            </li>
                         </ul>
                     </li>
-                @endcan
-
-                @can('superadmin.view')
+                
                     <li class="nav-item pcoded-hasmenu">
                         <a href="#!" class="nav-link"><span class="pcoded-micon"><i
                                     class="feather icon-settings"></i></span><span class="pcoded-mtext">
-                                    Setting</span></a>
+                                Setting</span></a>
                         <ul class="pcoded-submenu">
                             <li class="nav-item pcoded-hasmenu">
                                 <a href="#!" class="nav-link "><span class="pcoded-mtext">Roles and
@@ -100,34 +101,36 @@
                             </li>
                             <li class="nav-item pcoded-hasmenu">
                                 <a href="#!" class="nav-link "><span class="pcoded-mtext">Manage
-                                            Profile</span></a>
+                                        Profile</span></a>
                                 <ul class="pcoded-submenu">
                                     <li><a href="{{ route('profileview') }}">Profile</a></li>
                                     <li class="{{ Route::is('password.view') ? 'active' : '' }}">
-                                        <a href="{{ route('password.view') }}">Password Setting</a></li>
+                                        <a href="{{ route('password.view') }}">Password Setting</a>
+                                    </li>
                                 </ul>
                             </li>
                             <li class="nav-item pcoded-hasmenu">
                                 <a href="#!" class="nav-link "><span class="pcoded-mtext">Manage
-                                            Users</span></a>
+                                        Users</span></a>
                                 <ul class="pcoded-submenu">
                                     <li>
-                                        <a href="{{ route('users.index') }}">User List</a></li>
+                                        <a href="{{ route('users.index') }}">User List</a>
+                                    </li>
                                     <li class="{{ Route::is('users.create') ? 'active' : '' }}">
-                                        <a href="{{ route('users.create') }}">Add User</a></li>
+                                        <a href="{{ route('users.create') }}">Add User</a>
+                                    </li>
                                 </ul>
                             </li>
-                        <li class="nav-item"><a href="{{ route('audit.trail') }}">Audit Trail</a></li>
-                        <li class="nav-item"><a href="{{ route('login_and_logout') }}">User Logs Activities</a></li>
+                            <li class="nav-item"><a href="{{ route('audit.trail') }}">Audit Trail</a></li>
+                            <li class="nav-item"><a href="{{ route('login_and_logout') }}">User Logs Activities</a></li>
 
                         </ul>
                     </li>
-                @endcan
+                
 
                 <li class="nav-item pcoded">
                     <a href="{{ route('logout') }}" class="nav-link"><span class="pcoded-micon"><i
-                                class="fas fa-sign-out-alt"></i></span><span
-                                class="pcoded-mtext">Logout</span></a>
+                                class="fas fa-sign-out-alt"></i></span><span class="pcoded-mtext">Logout</span></a>
                 </li>
             </ul>
         </div>

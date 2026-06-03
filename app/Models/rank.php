@@ -60,8 +60,23 @@ final class Rank extends Model
 
     public function getRankNameAttribute()
     {
-        $column = str()->slug(str_replace(' ', '', auth()->user()->arm_of_service)).'_display';
+        $service = auth()->user()?->arm_of_service;
 
-        return $this->$column;
+        if (! $service) {
+            return $this->army_display
+                ?? $this->navy_display
+                ?? $this->airforce_display
+                ?? $this->rank_code
+                ?? '';
+        }
+
+        $column = str()->slug(str_replace(' ', '', $service)).'_display';
+
+        return $this->$column
+            ?? $this->army_display
+            ?? $this->navy_display
+            ?? $this->airforce_display
+            ?? $this->rank_code
+            ?? '';
     }
 }

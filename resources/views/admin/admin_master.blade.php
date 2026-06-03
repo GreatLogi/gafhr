@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/plugins/dataTables.bootstrap4.min.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/ekko-lightbox.css') }}">
-    {{-- <link rel="stylesheet" href="{{ asset('assets/css/plugins/select2.min.css') }}"> --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/plugins/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/plugins/select.bootstrap4.min.css') }}">
     {{-- <link rel="stylesheet" href="{{ asset('assets/css/plugins/daterangepicker.css') }}"> --}}
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css">
     <link rel="stylesheet" type="text/css" href=" https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
@@ -39,6 +40,12 @@
 </head>
 
 <body>
+    @php
+        $currentUser = Auth::user();
+        $user = $currentUser
+            ? DB::table('users')->where('id', $currentUser->id)->first()
+            : null;
+    @endphp
     @include('admin.sidebar')
     <!-- [ Header ] start -->
     <header class="navbar pcoded-header navbar-expand-lg navbar-light header-blue">
@@ -130,12 +137,6 @@
             </a>
         </div>
 
-        
-        @php
-            $user = DB::table('users')
-                ->where('id', Auth::user()->id)
-                ->first();
-        @endphp
         <div class="collapse navbar-collapse">
 
             <ul class="ml-auto navbar-nav">
@@ -172,25 +173,24 @@
                 </li>
                 <li>
                     <div class="dropdown drp-user">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            {{-- <i class="feather icon-user"></i> --}}
-                            <img src="{{ !empty($user->image) ? url('upload/user_images/' . $user->image) : url('upload/no_image.jpg') }}"
-                                class="img-radius" alt="User-Profile-Image" class="img-radius"height="40px"
-                                width="40px" />
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right profile-notification">
-                            <div class="pro-head">
-                                {{-- <img src="{{ !empty($user->image) ? url('upload/user_images/' . $user->image) : url('upload/no_image.jpg') }}" class="img-radius" alt="User-Profile-Image" class="img-radius"height="40px" width="40px"/> --}}
-                                <span>{{ Auth::user()->name }}</span>
+                        @if ($currentUser)
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="{{ !empty($user->image) ? url('upload/user_images/' . $user->image) : url('upload/no_image.jpg') }}"
+                                    class="img-radius" alt="User-Profile-Image" class="img-radius"height="40px"
+                                    width="40px" />
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right profile-notification">
+                                <div class="pro-head">
+                                    <span>{{ $currentUser->name }}</span>
+                                </div>
+                                <ul class="pro-body">
+                                    <li><a href="{{ route('profileview') }}" class="dropdown-item"><i
+                                                class="feather icon-user"></i> Profile</a></li>
+                                    <li><a href="{{ route('logout') }}" class="dropdown-item"><i
+                                                class="feather icon-lock"></i> Lock Screen</a></li>
+                                </ul>
                             </div>
-                            <ul class="pro-body">
-                                <li><a href="{{ route('profileview') }}" class="dropdown-item"><i
-                                            class="feather icon-user"></i> Profile</a></li>
-                                {{-- <li><a href="email_inbox.html" class="dropdown-item"><i class="feather icon-mail"></i> My Messages</a></li> --}}
-                                <li><a href="{{ route('logout') }}" class="dropdown-item"><i
-                                            class="feather icon-lock"></i> Lock Screen</a></li>
-                            </ul>
-                        </div>
+                        @endif
                     </div>
                 </li>
             </ul>
@@ -230,6 +230,7 @@
     <script src="{{ asset('assets/js/vendor-all.min.js ') }}"></script>
     <script src="{{ asset('assets/js/plugins/jquery.bootstrap.wizard.min.js') }}"></script>
     <script src="{{ asset('assets/js/plugins/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/plugins/select2.full.min.js') }}"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('assets/js/plugins/bootstrap.min.js ') }}"></script>
     <script src="{{ asset('assets/js/ripple.js ') }}"></script>

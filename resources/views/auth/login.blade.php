@@ -74,9 +74,6 @@
                         @endif
                     </div>
                     <button class="mb-4 btn btn-block btn-primary">Signin</button>
-                    <p class="mb-2 text-muted">Forgot password?
-                        <a href="{{ route('forgot-password') }}" class="f-w-400">Reset</a>
-                    </p>
                 </form>
             </div>
         </div>
